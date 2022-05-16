@@ -1,5 +1,5 @@
-#ifndef NPush
-#define NPush
+#ifndef NPush_h
+#define NPush_h
 
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
