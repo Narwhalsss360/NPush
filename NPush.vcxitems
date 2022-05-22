@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{7a568d34-eaaf-418c-85d3-78ba7431c45a}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="$(MSBuildThisFileDirectory)readme.txt" />
+	<Text Include="$(MSBuildThisFileDirectory)library.properties" />
+  	<Text Include="$(MSBuildThisFileDirectory)src\NPush.h" />
+  </ItemGroup>
+ <ItemGroup>
+    <!-- <ClInclude Include="$(MSBuildThisFileDirectory)NPush.h" /> -->
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\NPush.cpp" />
+  </ItemGroup>
+  </Project>
