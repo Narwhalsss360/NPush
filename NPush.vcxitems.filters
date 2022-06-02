@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx</Extensions>
     </Filter>
+    <Filter Include="Library metdata">
+      <UniqueIdentifier>{8a49c943-7cfa-4177-999d-a4bfb49ea4a6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="$(MSBuildThisFileDirectory)src\NPush.cpp">
@@ -16,10 +19,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="$(MSBuildThisFileDirectory)library.properties" />
     <Text Include="$(MSBuildThisFileDirectory)src\NPush.h">
       <Filter>Header Files</Filter>
     </Text>
-    <Text Include="$(MSBuildThisFileDirectory)keywords.txt" />
+    <Text Include="$(MSBuildThisFileDirectory)keywords.txt">
+      <Filter>Library metdata</Filter>
+    </Text>
+    <Text Include="$(MSBuildThisFileDirectory)library.properties">
+      <Filter>Library metdata</Filter>
+    </Text>
   </ItemGroup>
 </Project>
