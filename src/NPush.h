@@ -8,6 +8,8 @@
 #endif
 
 #include <NDefs.h>
+#include "NPushEvents.h"
+#include "NPushMacros.h"
 
 #define NPUSH_MAJOR_VERSION 1
 #define NPUSH_MINOR_VERSION 1
