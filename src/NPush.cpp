@@ -30,7 +30,7 @@ void Push::update()
 			state[PREVIOUS] = false;
 			state[PRESS] = false;
 			releasedHoldTime = millis() - onPressTime;
-			pressedHoldTime = 0;
+			pressedHoldTime = ZERO;
 			if (onRelease != NULL) onRelease(releasedHoldTime);
 		}
 		else
@@ -42,7 +42,7 @@ void Push::update()
 		{
 			state[PREVIOUS] = true;
 			state[PRESS] = true;
-			releasedHoldTime = 0;
+			releasedHoldTime = ZERO;
 			pressedHoldTime = millis();
 			onPressTime = millis();
 			if (onPress != NULL) onPress();
