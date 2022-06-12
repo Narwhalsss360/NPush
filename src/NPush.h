@@ -21,6 +21,7 @@ public:
 	unsigned int getPushedHoldTime();
 	void (*onRelease) (unsigned int);
 	void (*onPress) (void);
+
 private:
 	enum BUTTONSTATESINDEX
 	{
@@ -29,7 +30,7 @@ private:
 		RELEASE,
 		PREVIOUS
 	};
-	enum member
+	enum CLASSMEMBERS
 	{
 		PRESSEDMEMBER,
 		RELEASEDMEMBER
