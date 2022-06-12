@@ -17,7 +17,7 @@ Push::Push(byte _pin, bool _inverted, int _debounceDelay)
 /// </summary>
 void Push::update()
 {
-	if (millis() - this->lastDebounceTime >= this->debounceDelay)
+	if (millis() - lastDebounceTime >= debounceDelay)
 	{
 		called[PRESSEDMEMBER] = false;
 		called[RELEASEDMEMBER] = false;
@@ -38,12 +38,17 @@ void Push::update()
 			state[RELEASE] = false;
 		}
 
+		if (state[CURRENT] && state[PREVIOUS])
+		{
+			pressedHoldTime += debounceDelay;
+		}
+
 		if (state[CURRENT] && !state[PREVIOUS])
 		{
 			state[PREVIOUS] = true;
 			state[PRESS] = true;
 			releasedHoldTime = ZERO;
-			pressedHoldTime = millis();
+			pressedHoldTime = ZERO;
 			onPressTime = millis();
 			if (onPress != NULL) onPress();
 		}
