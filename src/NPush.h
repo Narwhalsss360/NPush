@@ -9,6 +9,10 @@
 
 #include <NDefs.h>
 
+#define NPUSH_MAJOR_VERSION 1
+#define NPUSH_MINOR_VERSION 0
+#define NPUSH_PATCH_VERSION 2
+
 class Push
 {
 public:
