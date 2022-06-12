@@ -1,7 +1,7 @@
 #define NPush_cpp
 #include "NPush.h"
 
-static uint8_t instanceCount = 0;
+static uint8_t instanceCount = ZERO;
 static Push **instances = NULL;
 
 /// <summary>
@@ -13,7 +13,7 @@ static Push **instances = NULL;
 Push::Push(byte _pin, bool _inverted, int _debounceDelay)
 	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL), onRelease(EventHandler()) ,onPush(EventHandler()), onReleaseArgs(OnReleaseEventArgs(this)),onPushArgs(OnPushEventArgs(this))
 {
-	if (instanceCount == 0)
+	if (instanceCount == ZERO)
 	{
 		instances = new Push * [instanceCount + 1];
 		instances[instanceCount] = this;
@@ -52,11 +52,15 @@ Push::~Push()
 /// </summary>
 void Push::update()
 {
-	if (NPush_TIME() - lastDebounceTime >= debounceDelay)
+	if (NPUSH_INTERVAL_CHECK())
 	{
 		called[PRESSEDMEMBER] = false;
 		called[RELEASEDMEMBER] = false;
+		
+		#ifndef NTimer_h
 		lastDebounceTime = NPush_TIME();
+		#endif
+
 		state[CURRENT] = (inverted) ? !digitalRead(pin) : digitalRead(pin);
 
 		if (!state[CURRENT] && state[PREVIOUS])

@@ -17,8 +17,10 @@
 
 #ifdef NTimer_h
 	#define NPush_TIME() runtime
+	#define NPUSH_INTERVAL_CHECK() interval(lastDebounceTime, debounceDelay)
 #else
 	#define NPush_TIME() millis()
+	#define NPUSH_INTERVAL_CHECK() millis() - lastDebounceTime >= debounceDelay
 #endif
 
 class Push
@@ -34,6 +36,7 @@ public:
 	unsigned int getPushedHoldTime();
 	EventHandler onRelease;
 	EventHandler onPush;
+
 private:
 	OnReleaseEventArgs onReleaseArgs;
 	OnPushEventArgs onPushArgs;
@@ -59,7 +62,6 @@ private:
 	unsigned int pressedHoldTime;
 	bool called[2];
 };
-
 
 extern void NPush_h_userLoop();
 
