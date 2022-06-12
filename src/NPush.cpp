@@ -22,7 +22,7 @@ void Push::update()
 		called[PRESSEDMEMBER] = false;
 		called[RELEASEDMEMBER] = false;
 		lastDebounceTime = millis();
-		state[CURRENT] = (inverted) ? !(bool)digitalRead(pin) : digitalRead(pin);
+		state[CURRENT] = (inverted) ? !digitalRead(pin) : digitalRead(pin);
 
 		if (!state[CURRENT] && state[PREVIOUS])
 		{
