@@ -19,37 +19,37 @@ void Push::update()
 {
 	if (millis() - this->lastDebounceTime >= this->debounceDelay)
 	{
-		this->called[PRESSEDMEMBER] = false;
-		this->called[RELEASEDMEMBER] = false;
-		this->lastDebounceTime = millis();
-		this->state[CURRENT] = (inverted) ? !(bool)digitalRead(this->pin) : digitalRead(this->pin);
+		called[PRESSEDMEMBER] = false;
+		called[RELEASEDMEMBER] = false;
+		lastDebounceTime = millis();
+		state[CURRENT] = (inverted) ? !(bool)digitalRead(pin) : digitalRead(pin);
 
-		if (!this->state[CURRENT] && this->state[PREVIOUS])
+		if (!state[CURRENT] && state[PREVIOUS])
 		{
-			this->state[RELEASE] = true;
-			this->state[PREVIOUS] = false;
-			this->state[PRESS] = false;
-			this->releasedHoldTime = millis() - this->onPressTime;
-			this->pressedHoldTime = 0;
-			if (this->onRelease != NULL) this->onRelease(this->releasedHoldTime);
+			state[RELEASE] = true;
+			state[PREVIOUS] = false;
+			state[PRESS] = false;
+			releasedHoldTime = millis() - onPressTime;
+			pressedHoldTime = 0;
+			if (onRelease != NULL) onRelease(releasedHoldTime);
 		}
 		else
 		{
-			this->state[RELEASE] = false;
+			state[RELEASE] = false;
 		}
 
-		if (this->state[CURRENT] && !this->state[PREVIOUS])
+		if (state[CURRENT] && !state[PREVIOUS])
 		{
-			this->state[PREVIOUS] = true;
-			this->state[PRESS] = true;
-			this->releasedHoldTime = 0;
-			this->pressedHoldTime = millis();
-			this->onPressTime = millis();
-			if (this->onPress != NULL) this->onPress();
+			state[PREVIOUS] = true;
+			state[PRESS] = true;
+			releasedHoldTime = 0;
+			pressedHoldTime = millis();
+			onPressTime = millis();
+			if (onPress != NULL) onPress();
 		}
 		else
 		{
-			this->state[PRESS] = false;
+			state[PRESS] = false;
 		}
 	}
 }
@@ -60,7 +60,7 @@ void Push::update()
 /// <returns>Current button state</returns>
 bool Push::current()
 {
-	return this->state[CURRENT];
+	return state[CURRENT];
 }
 
 /// <summary>
@@ -69,14 +69,14 @@ bool Push::current()
 /// <returns>Pressed bool</returns>
 bool Push::pressed()
 {
-	if (this->called[PRESSEDMEMBER])
+	if (called[PRESSEDMEMBER])
 	{
 		return false;
 	}
 	else
 	{
-		this->called[PRESSEDMEMBER] = true;
-		return this->state[PRESS];
+		called[PRESSEDMEMBER] = true;
+		return state[PRESS];
 	}
 }
 
@@ -86,14 +86,14 @@ bool Push::pressed()
 /// <returns>Released bool</returns>
 bool Push::released()
 {
-	if (this->called[RELEASEDMEMBER])
+	if (called[RELEASEDMEMBER])
 	{
 		return false;
 	}
 	else
 	{
-		this->called[RELEASEDMEMBER] = true;
-		return this->state[RELEASE];
+		called[RELEASEDMEMBER] = true;
+		return state[RELEASE];
 	}
 }
 
@@ -102,7 +102,7 @@ bool Push::released()
 /// </summary>
 unsigned int Push::getReleasedHoldTime()
 {
-	return this->releasedHoldTime;
+	return releasedHoldTime;
 }
 
 /// <summary>
@@ -110,5 +110,5 @@ unsigned int Push::getReleasedHoldTime()
 /// </summary>
 unsigned int Push::getPushedHoldTime()
 {
-	return this->pressedHoldTime;
+	return pressedHoldTime;
 }
