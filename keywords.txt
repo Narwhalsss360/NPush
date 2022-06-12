@@ -1,4 +1,8 @@
 NPush               	LITERAL1
+GET_OnReleaseEventArgs	LITERAL1
+ONRELEASE_ESR       	LITERAL1
+GET_OnPushEventArgs 	LITERAL1
+ONPUSH_ESR          	LITERAL1
 
 Push					KEYWORD1
 update				    KEYWORD2
