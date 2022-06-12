@@ -17,6 +17,7 @@ class Push
 {
 public:
 	Push(byte, bool, int);
+	~Push();
 	void update();
 	bool current();
 	bool pressed();
@@ -49,4 +50,12 @@ private:
 	unsigned int pressedHoldTime;
 	bool called[2];
 };
+
+
+extern void NPush_h_userLoop();
+
+#ifndef NPush_cpp
+#define loop NPush_h_userLoop
+#endif
+
 #endif

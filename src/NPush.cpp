@@ -1,4 +1,8 @@
+#define NPush_cpp
 #include "NPush.h"
+
+static uint8_t instanceCount = 0;
+static Push **instances = NULL;
 
 /// <summary>
 /// Push Class.
@@ -9,7 +13,38 @@
 Push::Push(byte _pin, bool _inverted, int _debounceDelay)
 	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onRelease(NULL), onPress(NULL), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL)
 {
+	if (instanceCount == 0)
+	{
+		instances = new Push * [instanceCount + 1];
+		instances[instanceCount] = this;
+		instanceCount++;
+	}
+	else
+	{
+		Push** temp = new Push * [instanceCount];
+		memmove(temp, instances, sizeof(Push) * instanceCount);
+
+		instances = new Push * [instanceCount + 1];
+		memmove(instances, temp, sizeof(Push) * instanceCount);
+
+		instances[instanceCount] = this;
+		instanceCount++;
+
+		delete[] temp;
+	}
 	pinMode(_pin, (inverted) ? INPUT_PULLUP : INPUT);
+}
+
+//Does not decrement counter, should never get to this point anyways, maybe in the future it would be fixed.
+Push::~Push()
+{
+	for (uint8_t instance = ZERO; instance < instanceCount; instance++)
+	{
+		if (instances[instance] == this)
+		{
+			instances[instance] = NULL;
+		}
+	}
 }
 
 /// <summary>
@@ -117,4 +152,13 @@ unsigned int Push::getReleasedHoldTime()
 unsigned int Push::getPushedHoldTime()
 {
 	return pressedHoldTime;
+}
+
+void loop()
+{
+	for (uint8_t instance = ZERO; instance < instanceCount; instance++)
+	{
+		if (instances[instance] != NULL) instances[instance]->update();
+	}
+	NPush_h_userLoop();
 }
