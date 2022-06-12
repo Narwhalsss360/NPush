@@ -32,10 +32,10 @@ public:
 	bool released();
 	unsigned int getReleasedHoldTime();
 	unsigned int getPushedHoldTime();
-	void (*onRelease) (unsigned int);
-	void (*onPress) (void);
+	EventHandler onRelease;
 	EventHandler onPush;
 private:
+	OnReleaseEventArgs onReleaseArgs;
 	OnPushEventArgs onPushArgs;
 	enum BUTTONSTATESINDEX
 	{

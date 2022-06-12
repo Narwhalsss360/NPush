@@ -10,13 +10,13 @@ struct OnReleaseEventArgs : public EventArgs
 {
     uint16_t holdTime;
     uint32_t pressedAt;
-    OnReleaseEventArgs();
+    OnReleaseEventArgs(void *_sender);
     OnReleaseEventArgs(uint16_t, uint32_t);
 };
 
 struct OnPushEventArgs : public EventArgs
 {
     uint32_t pressedAt;
-    OnPushEventArgs();
+    OnPushEventArgs(void *_sender);
     OnPushEventArgs(uint32_t);
 };

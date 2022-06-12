@@ -11,7 +11,7 @@ static Push **instances = NULL;
 /// <param name="_inverted">invert the input.</param>
 /// <param name="_debounceDelay">refresh time for debouncing.</param>
 Push::Push(byte _pin, bool _inverted, int _debounceDelay)
-	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onRelease(NULL), onPress(NULL), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL), onPush(EventHandler()), onPushArgs(OnPushEventArgs())
+	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL), onRelease(EventHandler()) ,onPush(EventHandler()), onReleaseArgs(OnReleaseEventArgs(this)),onPushArgs(OnPushEventArgs(this))
 {
 	if (instanceCount == 0)
 	{
@@ -64,9 +64,14 @@ void Push::update()
 			state[RELEASE] = true;
 			state[PREVIOUS] = false;
 			state[PRESS] = false;
+			
 			releasedHoldTime = NPush_TIME() - onPressTime;
 			pressedHoldTime = ZERO;
-			if (onRelease != NULL) onRelease(releasedHoldTime);
+
+			onReleaseArgs.pressedAt = NPush_TIME();
+			onReleaseArgs.holdTime = releasedHoldTime;
+
+			onRelease.invoke(&onReleaseArgs);
 		}
 		else
 		{
@@ -82,12 +87,13 @@ void Push::update()
 		{
 			state[PREVIOUS] = true;
 			state[PRESS] = true;
+
 			releasedHoldTime = ZERO;
 			pressedHoldTime = ZERO;
 			onPressTime = NPush_TIME();
-			onPushArgs.pressedAt = NPush_TIME();
+
+			onPushArgs.pressedAt = onPressTime;
 			onPush.invoke(&onPushArgs);
-			//if (onPress != NULL) onPress();
 		}
 		else
 		{

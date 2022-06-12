@@ -1,7 +1,7 @@
 #include "NPushEvents.h"
 
-OnReleaseEventArgs::OnReleaseEventArgs()
-    : holdTime(ZERO), pressedAt(ULONG_MAX)
+OnReleaseEventArgs::OnReleaseEventArgs(void *_sender)
+    : EventArgs(sender), holdTime(ZERO), pressedAt(ULONG_MAX)
 {
 }
 
@@ -10,8 +10,8 @@ OnReleaseEventArgs::OnReleaseEventArgs(uint16_t _holdTime, uint32_t _pressedAt)
 {
 }
 
-OnPushEventArgs::OnPushEventArgs()
-    : pressedAt(ULONG_MAX)
+OnPushEventArgs::OnPushEventArgs(void *_sender)
+    : EventArgs(_sender), pressedAt(ULONG_MAX)
 {
 }
 
