@@ -60,6 +60,7 @@ void Push::update()
 /// <returns>Current button state</returns>
 bool Push::current()
 {
+	update();
 	return state[CURRENT];
 }
 
