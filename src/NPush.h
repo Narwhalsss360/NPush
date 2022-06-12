@@ -13,6 +13,12 @@
 #define NPUSH_MINOR_VERSION 1
 #define NPUSH_PATCH_VERSION 0
 
+#ifdef NTimer_h
+	#define NPush_TIME() runtime
+#else
+	#define NPush_TIME() millis()
+#endif
+
 class Push
 {
 public:

@@ -52,11 +52,11 @@ Push::~Push()
 /// </summary>
 void Push::update()
 {
-	if (millis() - lastDebounceTime >= debounceDelay)
+	if (NPush_TIME() - lastDebounceTime >= debounceDelay)
 	{
 		called[PRESSEDMEMBER] = false;
 		called[RELEASEDMEMBER] = false;
-		lastDebounceTime = millis();
+		lastDebounceTime = NPush_TIME();
 		state[CURRENT] = (inverted) ? !digitalRead(pin) : digitalRead(pin);
 
 		if (!state[CURRENT] && state[PREVIOUS])
@@ -64,7 +64,7 @@ void Push::update()
 			state[RELEASE] = true;
 			state[PREVIOUS] = false;
 			state[PRESS] = false;
-			releasedHoldTime = millis() - onPressTime;
+			releasedHoldTime = NPush_TIME() - onPressTime;
 			pressedHoldTime = ZERO;
 			if (onRelease != NULL) onRelease(releasedHoldTime);
 		}
@@ -84,7 +84,7 @@ void Push::update()
 			state[PRESS] = true;
 			releasedHoldTime = ZERO;
 			pressedHoldTime = ZERO;
-			onPressTime = millis();
+			onPressTime = NPush_TIME();
 			if (onPress != NULL) onPress();
 		}
 		else
