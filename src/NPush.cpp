@@ -11,7 +11,7 @@ static Push **instances = NULL;
 /// <param name="_inverted">invert the input.</param>
 /// <param name="_debounceDelay">refresh time for debouncing.</param>
 Push::Push(byte _pin, bool _inverted, int _debounceDelay)
-	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onRelease(NULL), onPress(NULL), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL)
+	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onRelease(NULL), onPress(NULL), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL), onPush(EventHandler()), onPushArgs(OnPushEventArgs())
 {
 	if (instanceCount == 0)
 	{
@@ -85,7 +85,9 @@ void Push::update()
 			releasedHoldTime = ZERO;
 			pressedHoldTime = ZERO;
 			onPressTime = NPush_TIME();
-			if (onPress != NULL) onPress();
+			onPushArgs.pressedAt = NPush_TIME();
+			onPush.invoke(&onPushArgs);
+			//if (onPress != NULL) onPress();
 		}
 		else
 		{

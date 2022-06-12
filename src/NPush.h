@@ -34,8 +34,9 @@ public:
 	unsigned int getPushedHoldTime();
 	void (*onRelease) (unsigned int);
 	void (*onPress) (void);
-
+	EventHandler onPush;
 private:
+	OnPushEventArgs onPushArgs;
 	enum BUTTONSTATESINDEX
 	{
 		CURRENT,
