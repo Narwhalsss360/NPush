@@ -1,8 +1,8 @@
 #include <NPush.h>
 
 /*
-    This sketch is an example of using a callback function when the button gets pressed by setting
-    button.onPress to a function pointer that returns void and take void as arguments.
+    This sketch is an example of using a callback function when the button gets pressed by using '+='
+    to button.onPush. Use ONPUSH_ESR/ONRELEASE_ESR for easy usage.
 */
 
 //Serial.begin() rate
@@ -15,7 +15,7 @@ int buttonPin = 2;
 int debounce = 30;
 
 //Pin the LED is on.
-int ledPin = 3;
+int ledPin = LED_BUILTIN;
 
 //State the LED is.
 int currentLEDState = LOW;
@@ -24,28 +24,8 @@ Push button = Push(buttonPin, INPUT_PULLUP, debounce);
 //                    ^             ^          ^
 //                   pin      pull up/down debounce time
 
-void setup()
-{
-    Serial.begin(baudrate);
-
-    //Setting LED Pin as OUTPUT.
-    pinMode(ledPin, OUTPUT);
-
-    //Setting LED Pin to currentLEDState, this is the starting state.
-    digitalWrite(ledPin, currentLEDState);
-
-    //Adding a function that runs when the button gets pressed.
-    button.onPress = toggleLED;
-}
-
-void loop()
-{
-    //Read the pin, calculates when pressed/released and hold time.
-    button.update();
-}
-
 //Your function that runs when the button gets pressed.
-void toggleLED()
+ONPUSH_ESR(toggleLED, data,
 {
     //Toggles the LED
     if (currentLEDState == HIGH)
@@ -63,4 +43,22 @@ void toggleLED()
 
     //Writing the new state to the LED pin.
     digitalWrite(ledPin, currentLEDState);
+})
+
+void setup()
+{
+    Serial.begin(baudrate);
+
+    //Setting LED Pin as OUTPUT.
+    pinMode(ledPin, OUTPUT);
+
+    //Setting LED Pin to currentLEDState, this is the starting state.
+    digitalWrite(ledPin, currentLEDState);
+
+    //Adding a function that runs when the button gets pressed.
+    button.onPush += toggleLED;
+}
+
+void loop()
+{
 }
