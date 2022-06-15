@@ -1,6 +1,17 @@
 #define NPush_cpp
 #include "NPush.h"
 
+enum SREGBITS
+{
+	CURRENT,
+	PUSHED,
+	RELEASED,
+	PREVIOUS,
+	M_PUSHED,
+	M_RELEASED,
+	INVERTED
+};
+
 static uint8_t instanceCount = ZERO;
 static Push **instances = NULL;
 
@@ -11,7 +22,7 @@ static Push **instances = NULL;
 /// <param name="_inverted">invert the input.</param>
 /// <param name="_debounceDelay">refresh time for debouncing.</param>
 Push::Push(byte _pin, bool _inverted, int _debounceDelay)
-	:pin(_pin), inverted(_inverted), debounceDelay(_debounceDelay), onPressTime(NULL), releasedHoldTime(NULL), lastDebounceTime(NULL), pressedHoldTime(NULL), onRelease(EventHandler()) ,onPush(EventHandler()), onReleaseArgs(OnReleaseEventArgs(this)),onPushArgs(OnPushEventArgs(this))
+	:pin(_pin), debounceDelay(_debounceDelay), onRelease(EventHandler()) ,onPush(EventHandler()), onReleaseArgs(), onPushArgs(), holdTime(NULL)
 {
 	if (instanceCount == ZERO)
 	{
@@ -32,7 +43,12 @@ Push::Push(byte _pin, bool _inverted, int _debounceDelay)
 
 		delete[] temp;
 	}
-	pinMode(_pin, (inverted) ? INPUT_PULLUP : INPUT);
+
+	bitWrite(sreg, INVERTED, _inverted);
+	pinMode(_pin, (_inverted) ? INPUT_PULLUP : INPUT);
+
+	onReleaseArgs.sender = this;
+	onPushArgs.sender = this;
 }
 
 //Does not decrement counter, should never get to this point anyways, maybe in the future it would be fixed.
@@ -54,54 +70,46 @@ void Push::update()
 {
 	if (NPUSH_INTERVAL_CHECK())
 	{
-		called[PRESSEDMEMBER] = false;
-		called[RELEASEDMEMBER] = false;
+		bitClear(sreg, M_PUSHED);
+		bitClear(sreg, M_RELEASED);
 		
 		#ifndef NTimer_h
 		lastDebounceTime = NPush_TIME();
 		#endif
 
-		state[CURRENT] = (inverted) ? !digitalRead(pin) : digitalRead(pin);
+		bitWrite(sreg, CURRENT, (bitRead(sreg, INVERTED)) ? !digitalRead(pin) : digitalRead(pin)); 
 
-		if (!state[CURRENT] && state[PREVIOUS])
+		if (!bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
 		{
-			state[RELEASE] = true;
-			state[PREVIOUS] = false;
-			state[PRESS] = false;
+			bitSet(sreg, RELEASED);
+			bitClear(sreg, PREVIOUS);
+			bitClear(sreg, PUSHED);
 			
-			releasedHoldTime = NPush_TIME() - onPressTime;
-			pressedHoldTime = ZERO;
-
-			onReleaseArgs.pressedAt = NPush_TIME();
-			onReleaseArgs.holdTime = releasedHoldTime;
-
+			onReleaseArgs.holdTime = NPush_TIME() - onReleaseArgs.pressedAt;
 			onRelease.invoke(&onReleaseArgs);
 		}
 		else
 		{
-			state[RELEASE] = false;
+			bitClear(sreg, RELEASED);
 		}
 
-		if (state[CURRENT] && state[PREVIOUS])
+		if (bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
 		{
-			pressedHoldTime += debounceDelay;
+			onReleaseArgs.holdTime = NPush_TIME() - onReleaseArgs.pressedAt;
 		}
 
-		if (state[CURRENT] && !state[PREVIOUS])
+		if (bitRead(sreg, CURRENT) && !bitRead(sreg, PREVIOUS))
 		{
-			state[PREVIOUS] = true;
-			state[PRESS] = true;
+			bitSet(sreg, PREVIOUS);
+			bitSet(sreg, PUSHED);
 
-			releasedHoldTime = ZERO;
-			pressedHoldTime = ZERO;
-			onPressTime = NPush_TIME();
-
-			onPushArgs.pressedAt = onPressTime;
+			onReleaseArgs.pressedAt = NPush_TIME();
+			onPushArgs.pressedAt = onReleaseArgs.pressedAt;
 			onPush.invoke(&onPushArgs);
 		}
 		else
 		{
-			state[PRESS] = false;
+			bitClear(sreg, PUSHED);
 		}
 	}
 }
@@ -113,23 +121,23 @@ void Push::update()
 bool Push::current()
 {
 	update();
-	return state[CURRENT];
+	return bitRead(sreg, CURRENT);
 }
 
 /// <summary>
 /// Check if the button was just pressed(not the current state).
 /// </summary>
 /// <returns>Pressed bool</returns>
-bool Push::pressed()
+bool Push::pushed()
 {
-	if (called[PRESSEDMEMBER])
+	if (bitRead(sreg, M_PUSHED))
 	{
 		return false;
 	}
 	else
 	{
-		called[PRESSEDMEMBER] = true;
-		return state[PRESS];
+		bitSet(sreg, M_PUSHED);
+		return bitRead(sreg, M_PUSHED);
 	}
 }
 
@@ -139,31 +147,23 @@ bool Push::pressed()
 /// <returns>Released bool</returns>
 bool Push::released()
 {
-	if (called[RELEASEDMEMBER])
+	if (bitRead(sreg, M_RELEASED))
 	{
 		return false;
 	}
 	else
 	{
-		called[RELEASEDMEMBER] = true;
-		return state[RELEASE];
+		bitSet(sreg, M_RELEASED);
+		return bitRead(sreg, RELEASED);
 	}
 }
 
 /// <summary>
 /// If just released, get the time the button was held for.
 /// </summary>
-unsigned int Push::getReleasedHoldTime()
+uint16_t Push::getHoldTime()
 {
-	return releasedHoldTime;
-}
-
-/// <summary>
-/// If pressed, get the time the button has been held for.
-/// </summary>
-unsigned int Push::getPushedHoldTime()
-{
-	return pressedHoldTime;
+	return holdTime;
 }
 
 void loop()

@@ -30,37 +30,20 @@ public:
 	~Push();
 	void update();
 	bool current();
-	bool pressed();
+	bool pushed();
 	bool released();
-	unsigned int getReleasedHoldTime();
-	unsigned int getPushedHoldTime();
+	uint16_t getHoldTime();
 	EventHandler onRelease;
 	EventHandler onPush;
 
 private:
+	const byte pin;
+	const uint16_t debounceDelay;
+	byte sreg;
 	OnReleaseEventArgs onReleaseArgs;
 	OnPushEventArgs onPushArgs;
-	enum BUTTONSTATESINDEX
-	{
-		CURRENT,
-		PRESS,
-		RELEASE,
-		PREVIOUS
-	};
-	enum CLASSMEMBERS
-	{
-		PRESSEDMEMBER,
-		RELEASEDMEMBER
-	};
-	const byte pin;
-	const bool inverted;
-	const unsigned short debounceDelay;
-	bool state[4];
-	unsigned long onPressTime;
-	unsigned long lastDebounceTime;
-	unsigned int releasedHoldTime;
-	unsigned int pressedHoldTime;
-	bool called[2];
+	uint32_t lastDebounceTime;
+	uint16_t holdTime;
 };
 
 extern void NPush_h_userLoop();
