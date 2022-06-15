@@ -1,3 +1,6 @@
+#ifndef NPushEvents_h
+#define NPushEvents_h
+
 #if defined(ARDUINO) && ARDUINO >= 100
 	#include "Arduino.h"
 #else
@@ -16,3 +19,5 @@ struct OnPushEventArgs : public EventArgs
 {
     uint32_t pressedAt;
 };
+
+#endif
