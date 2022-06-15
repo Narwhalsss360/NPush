@@ -33,8 +33,8 @@ public:
 	bool pushed();
 	bool released();
 	uint16_t getHoldTime();
-	EventHandler onRelease;
-	EventHandler onPush;
+	event onRelease;
+	event onPush;
 
 private:
 	const byte pin;
