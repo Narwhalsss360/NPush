@@ -15,7 +15,7 @@ int baudrate = 9600;
 int buttonPin = 2;
 
 //Debounce time.
-int debounce = 10;
+int debounce = 5;
 
 Push button = Push(buttonPin, INPUT_PULLUP, debounce);
 //                    ^             ^          ^
@@ -23,10 +23,10 @@ Push button = Push(buttonPin, INPUT_PULLUP, debounce);
 
 void buttonISR()
 {
-    button.update();
+    button.update(); //Update button NOW! will also run Events on OnPush/OnRelease EventHandlers.
 
     //Returns true when the button gets pressed.
-    if (button.pressed())
+    if (button.pushed())
     {
         Serial.println("Pressed button.");
     }
@@ -36,7 +36,7 @@ void buttonISR()
     {
         //Returns how much time in ms the button was held for. Must be called before 
         //next button.update() cycle or else the returned value will be 0.
-        int holdTime = button.getReleasedHoldTime();
+        int holdTime = button.getHoldTime();
 
         Serial.print("Released button. Held for ");
         Serial.print(holdTime);

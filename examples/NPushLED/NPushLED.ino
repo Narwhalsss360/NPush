@@ -38,7 +38,7 @@ ONPUSH_ESR(toggleLED, data,
     }
 
     //Print that the LED state is changing and what its changing to.
-    Serial.print("Pressed button, setting LED to: ");
+    Serial.print("Pushed button, setting LED to: ");
     Serial.println(currentLEDState);
 
     //Writing the new state to the LED pin.

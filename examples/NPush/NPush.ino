@@ -29,21 +29,21 @@ void setup()
 void loop()
 {
     //Read the pin, calculates when pressed/released and hold time.
-    button.update();
+    //button.update(); //Now done automagically, if running blocking code, run this.
 
     //Returns true when the button gets pressed.
-    if (button.pressed())
+    if (button.pushed())
     {
-        Serial.println("Pressed button.");
+        Serial.println("Pushed button.");
     }
 
     //Returns true while the button is pressed.
     if (button.current())
     {
         //Returns how much time you have been holding the button while pressing it.
-        int holdTime = button.getPushedHoldTime();
+        int holdTime = button.getHoldTime();
 
-        Serial.print("Pressing button for ");
+        Serial.print("Held button for ");
         Serial.print(holdTime);
         Serial.println("ms.");
     }
@@ -53,7 +53,7 @@ void loop()
     {
         //Returns how much time in ms the button was held for. Must be called before 
         //next button.update() cycle or else the returned value will be 0.
-        int holdTime = button.getReleasedHoldTime();
+        int holdTime = button.getHoldTime();
 
         Serial.print("Released button. Held for ");
         Serial.print(holdTime);
