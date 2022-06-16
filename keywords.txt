@@ -7,9 +7,8 @@ ONPUSH_ESR          	LITERAL1
 Push					KEYWORD1
 update				    KEYWORD2
 current				    KEYWORD2
-pressed				    KEYWORD2
+pushed				    KEYWORD2
 released				KEYWORD2
 onRelease				KEYWORD2
 onPush				    KEYWORD2
-getReleasedHoldTime		KEYWORD2
-getPushedHoldTime		KEYWORD2
+getHoldTime	        	KEYWORD2
