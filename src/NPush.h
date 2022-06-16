@@ -49,10 +49,10 @@ public:
 		else
 		{
 			Push** temp = new Push *[PushInstanceCount];
-			memmove(temp, PushInstances, sizeof(Push) * PushInstanceCount);
+			memmove(temp, PushInstances, sizeof(Push *) * PushInstanceCount);
 
 			PushInstances = new Push *[PushInstanceCount + 1];
-			memmove(PushInstances, temp, sizeof(Push) * PushInstanceCount);
+			memmove(PushInstances, temp, sizeof(Push *) * PushInstanceCount);
 
 			PushInstances[PushInstanceCount] = this;
 			PushInstanceCount++;
