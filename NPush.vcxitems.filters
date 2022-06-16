@@ -9,11 +9,11 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx</Extensions>
     </Filter>
-    <Filter Include="Library metdata">
-      <UniqueIdentifier>{8a49c943-7cfa-4177-999d-a4bfb49ea4a6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Examples">
       <UniqueIdentifier>{c6471f1d-aea7-435d-b647-8d44abc7e2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Library metadata">
+      <UniqueIdentifier>{8a49c943-7cfa-4177-999d-a4bfb49ea4a6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -21,10 +21,10 @@
       <Filter>Header Files</Filter>
     </Text>
     <Text Include="$(MSBuildThisFileDirectory)keywords.txt">
-      <Filter>Library metdata</Filter>
+      <Filter>Library metadata</Filter>
     </Text>
     <Text Include="$(MSBuildThisFileDirectory)library.properties">
-      <Filter>Library metdata</Filter>
+      <Filter>Library metadata</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>
@@ -47,6 +47,9 @@
     </None>
     <None Include="$(MSBuildThisFileDirectory)examples\UsingEvents\UsingEvents.ino">
       <Filter>Examples</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)..\NHC-SR04\README.md">
+      <Filter>Library metadata</Filter>
     </None>
   </ItemGroup>
 </Project>

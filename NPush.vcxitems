@@ -22,6 +22,7 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\NPushMacros.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)..\NHC-SR04\README.md" />
     <None Include="$(MSBuildThisFileDirectory)examples\IncrDecr\IncrDecr.ino" />
     <None Include="$(MSBuildThisFileDirectory)examples\Interrupt\Interrupt.ino" />
     <None Include="$(MSBuildThisFileDirectory)examples\NPushLED\NPushLED.ino" />
