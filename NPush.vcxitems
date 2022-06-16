@@ -21,4 +21,11 @@
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)src\NPushMacros.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)examples\IncrDecr\IncrDecr.ino" />
+    <None Include="$(MSBuildThisFileDirectory)examples\Interrupt\Interrupt.ino" />
+    <None Include="$(MSBuildThisFileDirectory)examples\NPushLED\NPushLED.ino" />
+    <None Include="$(MSBuildThisFileDirectory)examples\NPush\NPush.ino" />
+    <None Include="$(MSBuildThisFileDirectory)examples\UsingEvents\UsingEvents.ino" />
+  </ItemGroup>
 </Project>

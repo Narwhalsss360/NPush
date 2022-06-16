@@ -12,6 +12,9 @@
     <Filter Include="Library metdata">
       <UniqueIdentifier>{8a49c943-7cfa-4177-999d-a4bfb49ea4a6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Examples">
+      <UniqueIdentifier>{c6471f1d-aea7-435d-b647-8d44abc7e2ef}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="$(MSBuildThisFileDirectory)src\NPush.h">
@@ -28,5 +31,22 @@
     <ClInclude Include="$(MSBuildThisFileDirectory)src\NPushMacros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)examples\IncrDecr\IncrDecr.ino">
+      <Filter>Examples</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)examples\NPush\NPush.ino">
+      <Filter>Examples</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)examples\Interrupt\Interrupt.ino">
+      <Filter>Examples</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)examples\NPushLED\NPushLED.ino">
+      <Filter>Examples</Filter>
+    </None>
+    <None Include="$(MSBuildThisFileDirectory)examples\UsingEvents\UsingEvents.ino">
+      <Filter>Examples</Filter>
+    </None>
   </ItemGroup>
 </Project>
