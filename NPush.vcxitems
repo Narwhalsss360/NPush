@@ -19,6 +19,6 @@
     <Text Include="$(MSBuildThisFileDirectory)src\NPush.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="$(MSBuildThisFileDirectory)src\NPush.cpp" />
+    <ClInclude Include="$(MSBuildThisFileDirectory)src\NPushMacros.h" />
   </ItemGroup>
 </Project>

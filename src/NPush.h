@@ -11,15 +11,11 @@
 #include "NPushEvents.h"
 #include "NPushMacros.h"
 
-#define NPUSH_MAJOR_VERSION 2
-#define NPUSH_MINOR_VERSION 1
-#define NPUSH_PATCH_VERSION 0
-
 #ifdef NTimer_h
-	#define NPush_TIME() runtime
+	#define time() runtime
 	#define NPUSH_INTERVAL_CHECK() interval(lastDebounceTime, debounceDelay)
 #else
-	#define NPush_TIME() millis()
+	#define time() millis()
 	#define NPUSH_INTERVAL_CHECK() millis() - lastDebounceTime >= debounceDelay
 #endif
 
@@ -89,7 +85,7 @@ public:
 			bitClear(sreg, M_RELEASED);
 			
 			#ifndef NTimer_h
-			lastDebounceTime = NPush_TIME();
+			lastDebounceTime = time();
 			#endif
 
 			bitWrite(sreg, CURRENT, ((bitRead(sreg, INVERTED)) ? !digitalRead(pin) : digitalRead(pin)));
@@ -100,7 +96,7 @@ public:
 				bitClear(sreg, PREVIOUS);
 				bitClear(sreg, PUSHED);
 				
-				onReleaseArgs.holdTime = NPush_TIME() - onReleaseArgs.pressedAt;
+				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
 				onRelease.invoke(&onReleaseArgs);
 			}
 			else
@@ -110,7 +106,7 @@ public:
 
 			if (bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
 			{
-				onReleaseArgs.holdTime = NPush_TIME() - onReleaseArgs.pressedAt;
+				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
 			}
 
 			if (bitRead(sreg, CURRENT) && !bitRead(sreg, PREVIOUS))
@@ -118,7 +114,7 @@ public:
 				bitSet(sreg, PREVIOUS);
 				bitSet(sreg, PUSHED);
 
-				onReleaseArgs.pressedAt = NPush_TIME();
+				onReleaseArgs.pressedAt = time();
 				onPushArgs.pressedAt = onReleaseArgs.pressedAt;
 				onPush.invoke(&onPushArgs);
 			}
@@ -180,15 +176,21 @@ private:
 
 extern void NPush_h_userLoop();
 
-void loop()
+void NPush_h_loop()
 {
 	for (uint8_t instance = ZERO; instance < PushInstanceCount; instance++)
 	{
 		if (PushInstances[instance] != NULL) PushInstances[instance]->update();
 	}
+}
+
+void loop()
+{
+	NPush_h_loop();
 	NPush_h_userLoop();
 }
 
 #define loop NPush_h_userLoop
+#undef time
 
 #endif
