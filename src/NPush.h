@@ -235,6 +235,38 @@ public:
 		}
 	}
 
+	bool current()
+	{
+		update();
+		return bitRead(sreg, CURRENT);
+	}
+
+	bool pushed()
+	{
+		if (bitRead(sreg, M_PUSHED))
+		{
+			return false;
+		}
+		else
+		{
+			bitSet(sreg, M_PUSHED);
+			return bitRead(sreg, PUSHED);
+		}
+	}
+
+	bool released()
+	{
+		if (bitRead(sreg, M_RELEASED))
+		{
+			return false;
+		}
+		else
+		{
+			bitSet(sreg, M_RELEASED);
+			return bitRead(sreg, RELEASED);
+		}
+	}
+
 	uint16_t getHoldTime()
 	{
 		return onReleaseArgs.holdTime;
