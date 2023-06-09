@@ -28,11 +28,6 @@
     </Text>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="$(MSBuildThisFileDirectory)src\NPushMacros.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)examples\IncrDecr\IncrDecr.ino">
       <Filter>Examples</Filter>
     </None>
@@ -51,5 +46,10 @@
     <None Include="$(MSBuildThisFileDirectory)..\NHC-SR04\README.md">
       <Filter>Library metadata</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)src\NPush.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

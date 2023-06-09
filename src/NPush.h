@@ -1,305 +1,55 @@
 #ifndef NPush_h
 #define NPush_h
 
-#if defined(ARDUINO) && ARDUINO >= 100
-	#include "Arduino.h"
-#else
-	#include "WProgram.h"
-#endif
+#include <Arduino.h>
+#include <NEvents.h>
+#include <TimeTypes.h>
 
-#include <NDefs.h>
-#include "NPushEvents.h"
-#include "NPushMacros.h"
+typedef void (*PushReader)();
 
-#ifdef NTimer_h
-	#define time() runtime
-	#define NPUSH_INTERVAL_CHECK() interval(lastDebounceTime, debounceDelay)
-#else
-	#define time() millis()
-	#define NPUSH_INTERVAL_CHECK() millis() - lastDebounceTime >= debounceDelay
-#endif
-
-typedef bool (*VirtualPushReader) (void);
-typedef class Push;
-uint8_t PushInstanceCount = ZERO;
-Push **PushInstances = NULL;
-
-enum SREGBITS
+struct PushedEventArgs
 {
-	CURRENT,
-	PUSHED,
-	RELEASED,
-	PREVIOUS,
-	M_PUSHED,
-	M_RELEASED,
-	INVERTED
+    time_t pressedAt;
+};
+
+struct ReleasedEventArgs : PushedEventArgs
+{
+    time_t holdTime;
 };
 
 class Push
 {
 public:
-	Push(byte _pin, bool _inverted, int _debounceDelay)
-		:pin(_pin), debounceDelay(_debounceDelay), onRelease(EventHandler()) ,onPush(EventHandler()), onReleaseArgs(), onPushArgs()
-	{
-		if (PushInstanceCount == ZERO)
-		{
-			PushInstances = new Push * [PushInstanceCount + 1];
-			PushInstances[PushInstanceCount] = this;
-			PushInstanceCount++;
-		}
-		else
-		{
-			Push** temp = new Push *[PushInstanceCount];
-			memmove(temp, PushInstances, sizeof(Push *) * PushInstanceCount);
+    Push(PushReader reader, bool inverted, time_t debounce, bool bind = true);
 
-			PushInstances = new Push *[PushInstanceCount + 1];
-			memmove(PushInstances, temp, sizeof(Push *) * PushInstanceCount);
+    Push(byte pin, bool inverted, time_t debounce, bool bind = true);
 
-			PushInstances[PushInstanceCount] = this;
-			PushInstanceCount++;
+    void update();
 
-			delete[] temp;
-		}
+    bool current();
 
-		bitWrite(sreg, INVERTED, 1);
-		pinMode(_pin, (_inverted) ? INPUT_PULLUP : INPUT);
-		onReleaseArgs.sender = this;
-		onPushArgs.sender = this;
-	}
+    bool pushed();
 
-	~Push()
-	{
-		for (uint8_t instance = ZERO; instance < PushInstanceCount; instance++)
-		{
-			if (PushInstances[instance] == this)
-			{
-				PushInstances[instance] = NULL;
-			}
-		}
-	}
+    bool released();
 
-	void update()
-	{
-		if (NPUSH_INTERVAL_CHECK())
-		{
-			bitClear(sreg, M_PUSHED);
-			bitClear(sreg, M_RELEASED);
-			
-			#ifndef NTimer_h
-			lastDebounceTime = time();
-			#endif
+    time_t getHoldTime();
 
-			bitWrite(sreg, CURRENT, ((bitRead(sreg, INVERTED)) ? !digitalRead(pin) : digitalRead(pin)));
+    void setReader(PushReader reader);
 
-			if (!bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
-			{
-				bitSet(sreg, RELEASED);
-				bitClear(sreg, PREVIOUS);
-				bitClear(sreg, PUSHED);
-				
-				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
-				onRelease.invoke(&onReleaseArgs);
-			}
-			else
-			{
-				bitClear(sreg, RELEASED);
-			}
+    void setReader(byte pin);
 
-			if (bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
-			{
-				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
-			}
+    Event<Push> push;
 
-			if (bitRead(sreg, CURRENT) && !bitRead(sreg, PREVIOUS))
-			{
-				bitSet(sreg, PREVIOUS);
-				bitSet(sreg, PUSHED);
+    Event<Push> release;
 
-				onReleaseArgs.pressedAt = time();
-				onPushArgs.pressedAt = onReleaseArgs.pressedAt;
-				onPush.invoke(&onPushArgs);
-			}
-			else
-			{
-				bitClear(sreg, PUSHED);
-			}
-		}
-	}
-
-	bool current()
-	{
-		update();
-		return bitRead(sreg, CURRENT);
-	}
-
-	bool pushed()
-	{
-		if (bitRead(sreg, M_PUSHED))
-		{
-			return false;
-		}
-		else
-		{
-			bitSet(sreg, M_PUSHED);
-			return bitRead(sreg, PUSHED);
-		}
-	}
-
-	bool released()
-	{
-		if (bitRead(sreg, M_RELEASED))
-		{
-			return false;
-		}
-		else
-		{
-			bitSet(sreg, M_RELEASED);
-			return bitRead(sreg, RELEASED);
-		}
-	}
-
-	uint16_t getHoldTime()
-	{
-		return onReleaseArgs.holdTime;
-	}
-
-	event onRelease;
-	event onPush;
+    time_t debounce;
 
 private:
-	const byte pin;
-	const uint16_t debounceDelay;
-	byte sreg;
-	OnReleaseEventArgs onReleaseArgs;
-	OnPushEventArgs onPushArgs;
-	uint32_t lastDebounceTime;
+    PushReader m_Reader;
+    ReleasedEventArgs m_ReleasedArgs;
+    time_t m_LastDebounce;
+    byte lastDebounce;
+    VoidMemberVoid<Push> m_UpdateCallable;
 };
-
-class VirtualPush
-{
-public:
-	VirtualPush(VirtualPushReader reader, uint32_t debounceDelay)
-		: onRelease(EventHandler()), onPush(EventHandler()), reader(reader), debounceDelay(debounceDelay), lastDebounceTime(0), sreg(0), onReleaseArgs(OnReleaseEventArgs()), onPushArgs(OnPushEventArgs())
-	{
-	}
-
-	~VirtualPush()
-	{
-	}
-
-	void update()
-	{
-		if (NPUSH_INTERVAL_CHECK())
-		{
-			bitClear(sreg, M_PUSHED);
-			bitClear(sreg, M_RELEASED);
-		
-#ifndef NTimer_h
-			lastDebounceTime = time();
-#endif
-
-			bitWrite(sreg, CURRENT, reader());
-
-			if (!bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
-			{
-				bitSet(sreg, RELEASED);
-				bitClear(sreg, PREVIOUS);
-				bitClear(sreg, PUSHED);
-
-				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
-				onRelease.invoke(&onReleaseArgs);
-			}
-			else
-			{
-				bitClear(sreg, RELEASED);
-			}
-
-			if (bitRead(sreg, CURRENT) && bitRead(sreg, PREVIOUS))
-			{
-				onReleaseArgs.holdTime = time() - onReleaseArgs.pressedAt;
-			}
-
-			if (bitRead(sreg, CURRENT) && !bitRead(sreg, PREVIOUS))
-			{
-				bitSet(sreg, PREVIOUS);
-				bitSet(sreg, PUSHED);
-
-				onReleaseArgs.pressedAt = time();
-				onPushArgs.pressedAt = onReleaseArgs.pressedAt;
-				onPush.invoke(&onPushArgs);
-			}
-			else
-			{
-				bitClear(sreg, PUSHED);
-			}
-		}
-	}
-
-	bool current()
-	{
-		update();
-		return bitRead(sreg, CURRENT);
-	}
-
-	bool pushed()
-	{
-		if (bitRead(sreg, M_PUSHED))
-		{
-			return false;
-		}
-		else
-		{
-			bitSet(sreg, M_PUSHED);
-			return bitRead(sreg, PUSHED);
-		}
-	}
-
-	bool released()
-	{
-		if (bitRead(sreg, M_RELEASED))
-		{
-			return false;
-		}
-		else
-		{
-			bitSet(sreg, M_RELEASED);
-			return bitRead(sreg, RELEASED);
-		}
-	}
-
-	uint16_t getHoldTime()
-	{
-		return onReleaseArgs.holdTime;
-	}
-
-	event onRelease;
-	event onPush;
-private:
-	VirtualPushReader reader;
-	uint32_t debounceDelay;
-	uint32_t lastDebounceTime;
-	byte sreg;
-	OnReleaseEventArgs onReleaseArgs;
-	OnPushEventArgs onPushArgs;
-};
-
-extern void NPush_h_userLoop();
-
-void NPush_h_loop()
-{
-	for (uint8_t instance = ZERO; instance < PushInstanceCount; instance++)
-	{
-		if (PushInstances[instance] != NULL) PushInstances[instance]->update();
-	}
-}
-
-void loop()
-{
-	NPush_h_loop();
-	NPush_h_userLoop();
-}
-
-#define loop NPush_h_userLoop
-#undef time
 
 #endif
