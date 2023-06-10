@@ -5,7 +5,7 @@
 #include <NEvents.h>
 #include <TimeTypes.h>
 
-typedef void (*PushReader)();
+typedef bool (*PushReader)();
 
 struct PushedEventArgs
 {
@@ -48,7 +48,7 @@ private:
     PushReader m_Reader;
     ReleasedEventArgs m_ReleasedArgs;
     time_t m_LastDebounce;
-    byte lastDebounce;
+    byte m_Status;
     VoidMemberVoid<Push> m_UpdateCallable;
 };
 

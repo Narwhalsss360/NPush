@@ -3,6 +3,8 @@
 #include <Uptime.h>
 #include <SketchBoundLibrary.h>
 
+#include <Arduino.h>
+
 #define s_r(b) bitRead(m_Status, b)
 #define s_c(b) bitClear(m_Status, b)
 #define s_s(b) bitSet(m_Status, b)
@@ -27,21 +29,21 @@ Push::Push(PushReader reader, bool inverted, time_t debounce, bool bind)
     s_w(Inverted, inverted);
     setReader(reader);
     if (bind)
-        addSketchBinding(bind_loop, m_UpdateCallable);
+        addSketchBinding(bind_loop, &m_UpdateCallable);
 }
 
 Push::Push(byte pin, bool inverted, time_t debounce, bool bind)
     : push(Event<Push>()), release(Event<Push>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime()), m_UpdateCallable(VoidMemberVoid<Push>(this, &Push::update))
 {
     s_w(Inverted, inverted);
-    setReader(reader);
+    setReader(pin);
     if (bind)
-        addSketchBinding(bind_loop, m_UpdateCallable);
+        addSketchBinding(bind_loop, &m_UpdateCallable);
 }
 
 void Push::update()
 {
-    if (s_r(Virtual) && !reader)
+    if (s_r(Virtual) && !m_Reader)
         return;
 
     if (!intervalElapsed(m_LastDebounce, debounce))
@@ -51,10 +53,12 @@ void Push::update()
     s_c(r_Released);
 
     s_w
-    (Current,
+    (
+        Current,
         INVERTABLE
-        (s_r(Inverted),
-            (s_r(Virtual)?
+        (
+            s_r(Inverted),
+            (s_r(Virtual) ?
                 m_Reader()
                 :
                 digitalRead((byte)m_Reader)
@@ -68,7 +72,7 @@ void Push::update()
         s_c(Previous);
         s_c(Pushed);
         m_ReleasedArgs.holdTime = getHoldTime();
-        release(&m_ReleasedArgs);
+        //release(&m_ReleasedArgs);
         return;
     }
     s_c(Released);
@@ -77,9 +81,8 @@ void Push::update()
     {
         s_s(Pushed);
         s_s(Previous);
-        s_c(Released);
         m_ReleasedArgs.pressedAt = uptime();
-        push(&m_ReleasedArgs);
+        //push(&m_ReleasedArgs);
         return;
     }
     s_c(Pushed);
@@ -106,8 +109,7 @@ bool Push::released()
     update();
     if (s_r(r_Released))
         return false;
-
-    s_s(r_Released)
+    s_s(r_Released);
     return s_r(Released);
 }
 
@@ -126,4 +128,5 @@ void Push::setReader(byte pin)
 {
     s_c(Virtual);
     m_Reader = (PushReader)pin;
+    pinMode((byte)pin, (s_r(Inverted) ? INPUT_PULLUP : INPUT));
 }
