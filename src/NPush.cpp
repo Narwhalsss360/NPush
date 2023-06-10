@@ -3,8 +3,6 @@
 #include <Uptime.h>
 #include <SketchBoundLibrary.h>
 
-#include <Arduino.h>
-
 #define s_r(b) bitRead(m_Status, b)
 #define s_c(b) bitClear(m_Status, b)
 #define s_s(b) bitSet(m_Status, b)
@@ -72,7 +70,7 @@ void Push::update()
         s_c(Previous);
         s_c(Pushed);
         m_ReleasedArgs.holdTime = getHoldTime();
-        //release(&m_ReleasedArgs);
+        release(&m_ReleasedArgs);
         return;
     }
     s_c(Released);
@@ -82,7 +80,7 @@ void Push::update()
         s_s(Pushed);
         s_s(Previous);
         m_ReleasedArgs.pressedAt = uptime();
-        //push(&m_ReleasedArgs);
+        push(&m_ReleasedArgs);
         return;
     }
     s_c(Pushed);
