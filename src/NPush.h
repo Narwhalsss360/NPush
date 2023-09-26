@@ -38,9 +38,9 @@ public:
 
     void setReader(byte pin);
 
-    Event<Push> push;
+    Event<Push, PushedEventArgs&> push;
 
-    Event<Push> release;
+    Event<Push, ReleasedEventArgs&> release;
 
     time_t debounce;
 
@@ -49,7 +49,6 @@ private:
     ReleasedEventArgs m_ReleasedArgs;
     time_t m_LastDebounce;
     byte m_Status;
-    VoidMemberVoid<Push> m_UpdateCallable;
 };
 
 #endif

@@ -22,21 +22,21 @@ enum StatusBits
 };
 
 Push::Push(PushReader reader, bool inverted, time_t debounce, bool bind)
-    : push(Event<Push>()), release(Event<Push>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime()), m_UpdateCallable(VoidMemberVoid<Push>(this, &Push::update))
+    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
     setReader(reader);
     if (bind)
-        addSketchBinding(bind_loop, &m_UpdateCallable);
+        addSketchBinding(bind_loop, &invokable_get(this, &Push::update));
 }
 
 Push::Push(byte pin, bool inverted, time_t debounce, bool bind)
-    : push(Event<Push>()), release(Event<Push>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime()), m_UpdateCallable(VoidMemberVoid<Push>(this, &Push::update))
+    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
     setReader(pin);
     if (bind)
-        addSketchBinding(bind_loop, &m_UpdateCallable);
+        addSketchBinding(bind_loop, &invokable_get(this, &Push::update));
 }
 
 void Push::update()
@@ -70,7 +70,7 @@ void Push::update()
         s_c(Previous);
         s_c(Pushed);
         m_ReleasedArgs.holdTime = getHoldTime();
-        release(&m_ReleasedArgs);
+        release(m_ReleasedArgs);
         return;
     }
     s_c(Released);
@@ -80,7 +80,7 @@ void Push::update()
         s_s(Pushed);
         s_s(Previous);
         m_ReleasedArgs.pressedAt = uptime();
-        push(&m_ReleasedArgs);
+        push(m_ReleasedArgs);
         return;
     }
     s_c(Pushed);

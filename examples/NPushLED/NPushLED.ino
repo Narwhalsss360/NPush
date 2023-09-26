@@ -25,7 +25,7 @@ Push button = Push(buttonPin, INPUT_PULLUP, debounce);
 //                   pin      pull up/down debounce time
 
 //Your function that runs when the button gets pressed.
-ONPUSH_ESR(toggleLED, data,
+void toggleLED(PushedEventArgs& args)
 {
     //Toggles the LED
     if (currentLEDState == HIGH)
@@ -43,7 +43,7 @@ ONPUSH_ESR(toggleLED, data,
 
     //Writing the new state to the LED pin.
     digitalWrite(ledPin, currentLEDState);
-})
+}
 
 void setup()
 {
@@ -56,7 +56,7 @@ void setup()
     digitalWrite(ledPin, currentLEDState);
 
     //Adding a function that runs when the button gets pressed.
-    button.onPush += toggleLED;
+    button.push += toggleLED;
 }
 
 void loop()

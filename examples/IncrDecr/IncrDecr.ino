@@ -1,4 +1,4 @@
-#include <LiteTimer.h> //NTimer Library
+#include <TimedInterval.h.h> //NTimer Library
 #include <NPush.h>
 
 #define BAUDRATE 9600
@@ -25,7 +25,7 @@ void loop()
 {
     while (incrementButton.current())
     {
-        if (interval(lastChange, INCRDECR_INTERVAL))
+        if (intervalElapsed(lastChange, INCRDECR_INTERVAL))
         {
             counter++;
             Serial.println(counter);
@@ -34,7 +34,7 @@ void loop()
 
     while (decrementButton.current())
     {
-        if (interval(lastChange, INCRDECR_INTERVAL))
+        if (intervalElapsed(lastChange, INCRDECR_INTERVAL))
         {
             counter--;
             Serial.println(counter);
