@@ -24,24 +24,40 @@ public:
 
     Push(byte pin, bool inverted, time_t debounce, bool bind = true);
 
+    /// @brief Read reader state, interpret button state.
     void update();
 
+    /// @brief Simple reader state read.
+    /// @return `bool` reader state
     bool current();
 
+    /// @brief Whether the button was pushed since last check.
+    /// @return `bool` was pushed
     bool pushed();
 
+    /// @brief Whether the button was released since last check.
+    /// @return `bool` was released
     bool released();
 
+    /// @brief Gets the time the button was held for. (Call after `released()` returns `true`).
+    /// @return `time_t` time held
     time_t getHoldTime();
 
+    /// @brief Change the state reader. (`PushReader` overload).
+    /// @param reader reader
     void setReader(PushReader reader);
 
+    /// @brief Change the state reader. (`byte`|`pin` overload).
+    /// @param pin pin
     void setReader(byte pin);
 
+    /// @brief Event invoked when button pushed. (caller: `update()`)
     Event<Push, PushedEventArgs&> push;
 
+    /// @brief Event invoked when button released. (caller: `update()`)
     Event<Push, ReleasedEventArgs&> release;
 
+    /// @brief Debounce time for reader (ignore time).
     time_t debounce;
 
 private:

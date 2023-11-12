@@ -1,14 +1,12 @@
 NPush               	LITERAL1
-GET_OnReleaseEventArgs	LITERAL1
-ONRELEASE_ESR       	LITERAL1
-GET_OnPushEventArgs 	LITERAL1
-ONPUSH_ESR          	LITERAL1
 
 Push					KEYWORD1
 update				    KEYWORD2
 current				    KEYWORD2
 pushed				    KEYWORD2
 released				KEYWORD2
-onRelease				KEYWORD2
-onPush				    KEYWORD2
 getHoldTime	        	KEYWORD2
+setReader               KEYWORD2
+release				    KEYWORD2
+push   				    KEYWORD2
+debounce                KEYWORD2
