@@ -9,20 +9,20 @@ typedef bool (*PushReader)();
 
 struct PushedEventArgs
 {
-    time_t pressedAt;
+    ntime_t pressedAt;
 };
 
 struct ReleasedEventArgs : PushedEventArgs
 {
-    time_t holdTime;
+    ntime_t holdTime;
 };
 
 class Push
 {
 public:
-    Push(PushReader reader, bool inverted, time_t debounce, bool bind = true);
+    Push(PushReader reader, bool inverted, ntime_t debounce, bool bind = true);
 
-    Push(byte pin, bool inverted, time_t debounce, bool bind = true);
+    Push(byte pin, bool inverted, ntime_t debounce, bool bind = true);
 
     /// @brief Read reader state, interpret button state.
     void update();
@@ -41,7 +41,7 @@ public:
 
     /// @brief Gets the time the button was held for. (Call after `released()` returns `true`).
     /// @return `time_t` time held
-    time_t getHoldTime();
+    ntime_t getHoldTime();
 
     /// @brief Change the state reader. (`PushReader` overload).
     /// @param reader reader
@@ -58,12 +58,12 @@ public:
     Event<Push, ReleasedEventArgs&> release;
 
     /// @brief Debounce time for reader (ignore time).
-    time_t debounce;
+    ntime_t debounce;
 
 private:
     PushReader m_Reader;
     ReleasedEventArgs m_ReleasedArgs;
-    time_t m_LastDebounce;
+    ntime_t m_LastDebounce;
     byte m_Status;
 };
 

@@ -21,7 +21,7 @@ enum StatusBits
     Virtual
 };
 
-Push::Push(PushReader reader, bool inverted, time_t debounce, bool bind)
+Push::Push(PushReader reader, bool inverted, ntime_t debounce, bool bind)
     : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
@@ -30,7 +30,7 @@ Push::Push(PushReader reader, bool inverted, time_t debounce, bool bind)
         addSketchBinding(bind_loop, &invokable_get(this, &Push::update));
 }
 
-Push::Push(byte pin, bool inverted, time_t debounce, bool bind)
+Push::Push(byte pin, bool inverted, ntime_t debounce, bool bind)
     : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
@@ -59,7 +59,7 @@ void Push::update()
             (s_r(Virtual) ?
                 m_Reader()
                 :
-                digitalRead((byte)m_Reader)
+                digitalRead(*(byte*)&m_Reader)
             )
         )
     );
@@ -111,7 +111,7 @@ bool Push::released()
     return s_r(Released);
 }
 
-time_t Push::getHoldTime()
+ntime_t Push::getHoldTime()
 {
     return uptime() - m_ReleasedArgs.pressedAt;
 }
