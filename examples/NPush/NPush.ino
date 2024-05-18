@@ -1,3 +1,4 @@
+#include <AutoBind.h> //<- Auto update
 #include <NPush.h>
 
 /*
@@ -29,7 +30,7 @@ void setup()
 void loop()
 {
     //Read the pin, calculates when pressed/released and hold time.
-    //button.update(); //Now done automagically, if running blocking code, run this.
+    //button.update(); //Now done automagically, if running blocking code OR did not include AutoBind/SketchBinder, run this.
 
     //Returns true when the button gets pressed.
     if (button.pushed())
@@ -41,10 +42,10 @@ void loop()
     if (button.current())
     {
         //Returns how much time you have been holding the button while pressing it.
-        int holdTime = button.getHoldTime();
+        ntime_t holdTime = button.getHoldTime();
 
         Serial.print("Held button for ");
-        Serial.print(holdTime);
+        Serial.print(holdTime.milliseconds());
         Serial.println("ms.");
     }
 
@@ -53,10 +54,10 @@ void loop()
     {
         //Returns how much time in ms the button was held for. Must be called before 
         //next button.update() cycle or else the returned value will be 0.
-        int holdTime = button.getHoldTime();
+        ntime_t holdTime = button.getHoldTime();
 
         Serial.print("Released button. Held for ");
-        Serial.print(holdTime);
+        Serial.print(holdTime.milliseconds());
         Serial.println("ms.");
     }
 }

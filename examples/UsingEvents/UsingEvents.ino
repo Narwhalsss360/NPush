@@ -1,3 +1,4 @@
+#include <AutoBind.h>
 #include <NPush.h>
 
 #define BAUDRATE 9600
@@ -11,27 +12,47 @@
 #define DEBOUNCE_TIME 30
 
 //Buttons
-Push button1(BUTTON1_PIN, INPUT_PULLUP, DEBOUNCE_TIME);
-Push button2(BUTTON2_PIN, INPUT_PULLUP, DEBOUNCE_TIME);
-Push button3(BUTTON3_PIN, INPUT_PULLUP, DEBOUNCE_TIME);
-Push button4(BUTTON4_PIN, INPUT_PULLUP, DEBOUNCE_TIME);
-
-//Basic Event Handler Callback.
-void button1Push(PushedEventArgs& args)
+Push buttons[] =
 {
-    Serial.println("Button 1 pressed at " + String((uint32_t)args.pressedAt));
+    Push(BUTTON1_PIN, INPUT_PULLUP, DEBOUNCE_TIME),
+    Push(BUTTON2_PIN, INPUT_PULLUP, DEBOUNCE_TIME),
+    Push(BUTTON3_PIN, INPUT_PULLUP, DEBOUNCE_TIME),
+    Push(BUTTON4_PIN, INPUT_PULLUP, DEBOUNCE_TIME)
 }
 
-void button1Release(ReleasedEventArgs& args)
+size_t buttonCount = sizeof(buttons) / sizeof(buttons[0]);
+
+void buttonPushed(PushedEventArgs& args)
 {
-    Serial.println("Button 1 release, held for " + String((uint32_t)args.holdTime));
+    int index = args.sender - buttons;
+    if (index < 0 || index >= buttonCount)
+        return; //Pointer error
+
+    Serial.print("Button ");
+    Serial.print(index + 1);
+    Serial.println(" Pushed");
+}
+
+void buttonReleased(ReleasedEventArgs& args)
+{
+    int index = args.sender - buttons;
+    if (index < 0 || index >= buttonCount)
+        return; //Pointer error
+
+    Serial.print("Button ");
+    Serial.print(index + 1);
+    Serial.print(" Released, Held for ");
+    Serial.println(args.holdTime.milliseconds());
 }
 
 void setup()
 {
     Serial.begin(BAUDRATE);
-    button1.push += button1Push; //Adds a callback function when button gets pressed.
-    button1.release += button1Release;
+    for (int i = 0; i < buttonCount; i++)
+    {
+        buttons[i].push += buttonPushed;
+        buttons[i].release += buttonReleased;
+    }
 }
 
 void loop()

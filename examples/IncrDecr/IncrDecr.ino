@@ -7,12 +7,14 @@
 
 #define INCR_BUTTON_PIN 3
 #define DECR_BUTTON_PIN 4
-#define BUTTON_DEBOUNCE 30
+#define BUTTON_DEBOUNCE 30_ms
 
-Push incrementButton(INCR_BUTTON_PIN, INPUT_PULLUP, BUTTON_DEBOUNCE);
-Push decrementButton(DECR_BUTTON_PIN, INPUT_PULLUP, BUTTON_DEBOUNCE);
+#define DO_NOT_BIND false //Does not use SketchBinder since current() is used and does not require it
 
-uint32_t lastChange = 0;
+Push incrementButton(INCR_BUTTON_PIN, INPUT_PULLUP, BUTTON_DEBOUNCE, DO_NOT_BIND);
+Push decrementButton(DECR_BUTTON_PIN, INPUT_PULLUP, BUTTON_DEBOUNCE, DO_NOT_BIND);
+
+ntime_t lastChange = 0;
 
 int32_t counter = 0;
 

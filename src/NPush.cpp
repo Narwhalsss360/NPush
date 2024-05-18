@@ -69,6 +69,7 @@ void Push::update()
         s_s(Released);
         s_c(Previous);
         s_c(Pushed);
+        m_ReleasedArgs.sender = this;
         m_ReleasedArgs.holdTime = getHoldTime();
         release(m_ReleasedArgs);
         return;
@@ -79,6 +80,7 @@ void Push::update()
     {
         s_s(Pushed);
         s_s(Previous);
+        m_ReleasedArgs.sender = this;
         m_ReleasedArgs.pressedAt = uptime();
         push(m_ReleasedArgs);
         return;

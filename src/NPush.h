@@ -9,6 +9,7 @@ typedef bool (*PushReader)();
 
 struct PushedEventArgs
 {
+    Push* sender;
     ntime_t pressedAt;
 };
 
