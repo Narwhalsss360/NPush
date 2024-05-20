@@ -7,6 +7,8 @@
 
 typedef bool (*PushReader)();
 
+class Push;
+
 struct PushedEventArgs
 {
     Push* sender;
