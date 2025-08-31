@@ -1,7 +1,10 @@
 #include "NPush.h"
 #include <TimedInterval.h>
 #include <Uptime.h>
+#if __has_include(<SketchBoundLibrary.h>)
 #include <SketchBoundLibrary.h>
+#define NPush_Bindable
+#endif
 
 #define s_r(b) bitRead(m_Status, b)
 #define s_c(b) bitClear(m_Status, b)
@@ -21,22 +24,24 @@ enum StatusBits
     Virtual
 };
 
-Push::Push(PushReader reader, bool inverted, ntime_t debounce, bool bind)
-    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
+Push::Push(PushReader reader, bool inverted, ntime_t debounce)
+    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_updateMethod(Method<Push, void>(this, &Push::update)), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
     setReader(reader);
-    if (bind)
-        addSketchBinding(bind_loop, &invokable_get(this, &Push::update));
+#ifdef NPush_Bindable
+    addSketchBinding(bind_loop, &m_updateMethod);
+#endif
 }
 
-Push::Push(byte pin, bool inverted, ntime_t debounce, bool bind)
-    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
+Push::Push(byte pin, bool inverted, ntime_t debounce)
+    : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_updateMethod(Method<Push, void>(this, &Push::update)), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
     s_w(Inverted, inverted);
     setReader(pin);
-    if (bind)
-        addSketchBinding(bind_loop, &invokable_get(this, &Push::update));
+#ifdef NPush_Bindable
+    addSketchBinding(bind_loop, &m_updateMethod);
+#endif
 }
 
 void Push::update()

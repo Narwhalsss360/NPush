@@ -23,9 +23,9 @@ struct ReleasedEventArgs : PushedEventArgs
 class Push
 {
 public:
-    Push(PushReader reader, bool inverted, ntime_t debounce, bool bind = true);
+    Push(PushReader reader, bool inverted, ntime_t debounce);
 
-    Push(byte pin, bool inverted, ntime_t debounce, bool bind = true);
+    Push(byte pin, bool inverted, ntime_t debounce);
 
     /// @brief Read reader state, interpret button state.
     void update();
@@ -64,6 +64,7 @@ public:
     ntime_t debounce;
 
 private:
+    Method<Push, void> m_updateMethod;
     PushReader m_Reader;
     ReleasedEventArgs m_ReleasedArgs;
     ntime_t m_LastDebounce;
