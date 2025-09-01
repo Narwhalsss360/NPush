@@ -68,7 +68,17 @@ private:
     PushReader m_Reader;
     ReleasedEventArgs m_ReleasedArgs;
     ntime_t m_LastDebounce;
-    byte m_Status;
+    struct {
+        bool current : 1;
+        bool pushed : 1;
+        bool released : 1;
+        bool previous : 1;
+        bool pushedStatus : 1;
+        bool releasedStatus : 1;
+        bool inverted : 1;
+        bool virtualReader : 1;
+
+    } m_Status;
 };
 
 #endif

@@ -6,28 +6,12 @@
 #define NPush_Bindable
 #endif
 
-#define s_r(b) bitRead(m_Status, b)
-#define s_c(b) bitClear(m_Status, b)
-#define s_s(b) bitSet(m_Status, b)
-#define s_w(b, v) bitWrite(m_Status, b, v)
 #define INVERTABLE(i_cond, expr) ((i_cond) ? !expr : expr)
-
-enum StatusBits
-{
-    Current,
-    Pushed,
-    Released,
-    Previous,
-    r_Pushed,
-    r_Released,
-    Inverted,
-    Virtual
-};
 
 Push::Push(PushReader reader, bool inverted, ntime_t debounce)
     : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_updateMethod(Method<Push, void>(this, &Push::update)), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
-    s_w(Inverted, inverted);
+    m_Status.inverted = inverted;
     setReader(reader);
 #ifdef NPush_Bindable
     addSketchBinding(bind_loop, &m_updateMethod);
@@ -37,7 +21,7 @@ Push::Push(PushReader reader, bool inverted, ntime_t debounce)
 Push::Push(byte pin, bool inverted, ntime_t debounce)
     : push(Event<Push, PushedEventArgs&>()), release(Event<Push, ReleasedEventArgs&>()), debounce(debounce), m_updateMethod(Method<Push, void>(this, &Push::update)), m_Reader(nullptr), m_ReleasedArgs(ReleasedEventArgs()), m_LastDebounce(uptime())
 {
-    s_w(Inverted, inverted);
+    m_Status.inverted = inverted;
     setReader(pin);
 #ifdef NPush_Bindable
     addSketchBinding(bind_loop, &m_updateMethod);
@@ -46,76 +30,74 @@ Push::Push(byte pin, bool inverted, ntime_t debounce)
 
 void Push::update()
 {
-    if (s_r(Virtual) && !m_Reader)
+    if (m_Status.virtualReader && !m_Reader)
         return;
 
     if (!intervalElapsed(m_LastDebounce, debounce))
         return;
 
-    s_c(r_Pushed);
-    s_c(r_Released);
+    m_Status.pushedStatus = false;
+    m_Status.releasedStatus = false;
 
-    s_w
+
+    m_Status.current = INVERTABLE
     (
-        Current,
-        INVERTABLE
+        m_Status.inverted,
         (
-            s_r(Inverted),
-            (s_r(Virtual) ?
+            m_Status.virtualReader ?
                 m_Reader()
                 :
                 digitalRead(*(byte*)&m_Reader)
-            )
         )
     );
 
-    if (!s_r(Current) && s_r(Previous))
+    if (!m_Status.current && m_Status.previous)
     {
-        s_s(Released);
-        s_c(Previous);
-        s_c(Pushed);
+        m_Status.released = true;
+        m_Status.previous = false;
+        m_Status.pushed = false;
         m_ReleasedArgs.sender = this;
         m_ReleasedArgs.holdTime = getHoldTime();
         release(m_ReleasedArgs);
         return;
     }
-    s_c(Released);
+    m_Status.released = false;
 
-    if (s_r(Current) && !s_r(Previous))
+    if (m_Status.current && !m_Status.previous)
     {
-        s_s(Pushed);
-        s_s(Previous);
+        m_Status.pushed = true;
+        m_Status.previous = true;
         m_ReleasedArgs.sender = this;
         m_ReleasedArgs.pressedAt = uptime();
         push(m_ReleasedArgs);
         return;
     }
-    s_c(Pushed);
+    m_Status.pushed = false;
 }
 
 bool Push::current()
 {
     update();
-    return s_r(Current);
+    return m_Status.current;
 }
 
 bool Push::pushed()
 {
     update();
-    if (s_r(r_Pushed))
+    if (m_Status.pushedStatus)
         return false;
 
-    s_s(r_Pushed);
-    return s_r(Pushed);
+    m_Status.pushedStatus = true;
+    return true;
 }
 
 bool Push::released()
 {
     update();
-    if (s_r(r_Released))
+    if (m_Status.releasedStatus)
         return false;
-    s_s(r_Released);
-    return s_r(Released);
+    m_Status.releasedStatus = true;
+    return true;
 }
 
 ntime_t Push::getHoldTime()
@@ -125,13 +107,13 @@ ntime_t Push::getHoldTime()
 
 void Push::setReader(PushReader reader)
 {
-    s_s(Virtual);
+    m_Status.virtualReader = true;
     m_Reader = reader;
 }
 
 void Push::setReader(byte pin)
 {
-    s_c(Virtual);
+    m_Status.virtualReader = false;
     m_Reader = (PushReader)pin;
-    pinMode((byte)pin, (s_r(Inverted) ? INPUT_PULLUP : INPUT));
+    pinMode((byte)pin, (m_Status.inverted ? INPUT_PULLUP : INPUT));
 }
